@@ -1,10 +1,10 @@
 # peak-fitness
 
 ## Team members
-Jane Liu\n
-Vivian Li\n
-Giancarlo Gonzalez\n
-Ananya Nidamangala Srinivasa\n
+Jane Liu  
+Vivian Li  
+Giancarlo Gonzalez  
+Ananya Nidamangala Srinivasa  
 
 ## Spirit Guide
 Joshua Lynch
