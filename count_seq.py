@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 from Bio.Align import substitution_matrices
+import pytest
+
+amino_acids='A C D E F G H I K L M N P Q R S T V W Y'
+set_AA=set(amino_acids.split(' '))
 
 def count_score(peak,seq):
     '''
@@ -7,9 +11,17 @@ def count_score(peak,seq):
     We take two sequences of the same length and calculate pairwise scores across the alignment iteratively for each pair
     of amino acids in the sequence. It returns the total alignment score that we're calling the 'score'.
     '''
+   
+    if type(peak)!=str or type(seq)!=str:
+        raise ValueError('Input should be string')
+    if not set(peak).issubset(set_AA) or set(seq).issubset(set_AA):
+        raise ValueError("Invalid characters in sequence")
     if len(peak)!=len(seq):
         raise ValueError('Sequences must be the same length')
     
+    peak=peak.upper()
+    seq=seq.upper()
+
     score=0
     matrix=substitution_matrices.load("BLOSUM62")
     for i in range(len(peak)):
@@ -24,5 +36,29 @@ def count_score(peak,seq):
                 score+=matrix[(aa_2,aa_1)]
     return score
 
+##Tests
+
+def test_count_score_eq_len():
+    try:
+        count_score('AAA','AAAA')
+    except ValueError:
+        return
+    assert False,'expected ValueError'
+
+def test_count_score_not_string():
+    try:
+        count_score(1,2)
+    except ValueError:
+        return
+    assert False, 'expected ValueError'
+
+def test_count_seq_invalidAA():
+    try:
+        count_score('XYZ','OOP')
+    except ValueError:
+        return
+    assert False, 'expected ValueError'
 
     
+##Main()
+# print(count_score(1,2))
