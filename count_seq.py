@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 from Bio.Align import substitution_matrices
-import pytest
 
-amino_acids='A C D E F G H I K L M N P Q R S T V W Y'
-set_AA=set(amino_acids.split(' '))
 
 def count_score(peak,seq):
     '''
@@ -11,10 +8,12 @@ def count_score(peak,seq):
     We take two sequences of the same length and calculate pairwise scores across the alignment iteratively for each pair
     of amino acids in the sequence. It returns the total alignment score that we're calling the 'score'.
     '''
-   
+    amino_acids='A C D E F G H I K L M N P Q R S T V W Y'
+    set_AA=set(amino_acids.split(' '))
+
     if type(peak)!=str or type(seq)!=str:
         raise ValueError('Input should be string')
-    if not set(peak).issubset(set_AA) or set(seq).issubset(set_AA):
+    if not (set(peak).issubset(set_AA) or set(seq).issubset(set_AA)):
         raise ValueError("Invalid characters in sequence")
     if len(peak)!=len(seq):
         raise ValueError('Sequences must be the same length')
@@ -61,4 +60,4 @@ def test_count_seq_invalidAA():
 
     
 ##Main()
-# print(count_score(1,2))
+# print(count_score('PANDA','PALER'))
