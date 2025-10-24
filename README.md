@@ -5,3 +5,5 @@
 
 ## Spirit Guide
 Joshua Lynch
+
+Vivian Li
