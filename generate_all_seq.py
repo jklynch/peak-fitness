@@ -5,14 +5,17 @@
 import sys, os, itertools
 
 def generate_all_seqs(num_elements):
-    if num_elements > 1:
+    if num_elements > 1 and num_elements <= 6:
         aminoacids= list('ARTNCEQGHILKMFPSTWYV')
         all_seq = list(itertools.product(aminoacids, repeat=num_elements))
         all_seq= [''.join(seq) for seq in all_seq]
-        print(all_seq)
         return all_seq
     else:
         raise ValueError 
+
+
+#TESTS ---------------------------------------------------------
+
 
 def test_generate_all_seqs ():
     try:

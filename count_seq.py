@@ -35,7 +35,7 @@ def count_score(peak,seq):
                 score+=matrix[(aa_2,aa_1)]
     return score
 
-##Tests
+##Tests -------------------------------------------------------
 
 def test_count_score_eq_len():
     try:
