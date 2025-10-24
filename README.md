@@ -2,8 +2,8 @@
 
 ## Team members
 Jane Liu
+Vivian Li
 
 ## Spirit Guide
 Joshua Lynch
 
-Vivian Li
