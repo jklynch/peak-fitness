@@ -8,6 +8,8 @@ def generate_all_seqs(num_elements):
     if num_elements > 1:
         aminoacids= list('ARTNCEQGHILKMFPSTWYV')
         all_seq = list(itertools.product(aminoacids, repeat=num_elements))
+        all_seq= [''.join(seq) for seq in all_seq]
+        print(all_seq)
         return all_seq
     else:
         raise ValueError 
@@ -26,3 +28,9 @@ def test_zero ():
         return
     assert False
 
+def main ():
+    num_elements=2
+    generate_all_seqs(num_elements)
+
+if __name__== '__main__':
+    main()
