@@ -43,4 +43,11 @@ while True:
     screen.blit(inst4, inst4_rect)
     pg.display.flip()
     
-    
+#Wait for Input --------------------------------------------------
+
+def inputseqfunc():
+    inputseq=''
+    text1(f'Please enter a sequence of length {input_seq_length}', 300,400) #asks for seq
+    pygame.display.flip()
+    done = True
+    for
