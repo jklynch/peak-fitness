@@ -84,10 +84,10 @@ while True:
 		if flowcontrolplot1 == 0: # Prevents points being added forever
 			yval = seqs_scores[seq] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
 			xval =  seqs_scores_list.index(seq) / (max_index_val - min_index_val) * plotwidth #converts sequence index to the X value in plot
-			pg.draw.circle(plotrect, color=(0,0,0), center=(xval,yval), radius=3)
+			if seq != peak_seq:
+				pg.draw.circle(plotrect, color=(0,0,0), center=(xval,yval), radius=3)
+			elif seq == peak_seq:
+				pg.draw.circle(plotrect, color=(255,0,0), center=(xval,yval+20), radius=10)
 	flowcontrolplot1 = 1
-	if flowcontrolplot1 == 1:
-		pg.draw.circle(plotrect, color=(0,0,0), center=(seqs_scores_list.index(peak_seq),max_score_val), radius=3)
-		flowcontrolplot1 = 2
 	pg.display.flip() # Accumulates and renders ALL elements
 	
