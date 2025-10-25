@@ -40,6 +40,7 @@ class Screen:
         pass
 
 
+#ADD ONLY THINGS YOU WANT ON THE START SCREEN. WE CAN MAKE THIS VIBIER LATER? 
 # -------------------------------
 # Start Screen
 # -------------------------------
@@ -53,7 +54,7 @@ class StartScreen(Screen):
         self.figlet_font = pyfiglet.Figlet(font="ticks")  # You can try fonts like 'doom', 'banner3-D', etc.
         self.figlet_text = self.figlet_font.renderText("peak")
         
-        #adding instructions
+        #adding instructions to be printed
         self.subtitle_lines = [
             "Can you discover the most fit pentapeptide?",
             "Enter a starting sequence (5-mer)",
@@ -65,6 +66,7 @@ class StartScreen(Screen):
         # Render it onto a Pygame surface (we’ll convert ASCII text to a surface)
         self.figlet_surface = self.render_figlet_surface(self.figlet_text)
     
+    #making a figlet surface for peaks
     def render_figlet_surface(self, ascii_text):
         """Convert ASCII figlet text into a pygame surface."""
         lines = ascii_text.split("\n")
@@ -77,12 +79,13 @@ class StartScreen(Screen):
             surface.blit(line, (0, y))
             y += MONO_FONT.get_height()
         return surface
-
+    #handle inputs for this screen. only type of input will be a mouse click.
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.button_rect.collidepoint(event.pos):
                 self.manager.set_screen(GameScreen(self.manager, []))
 
+    #putting things on the screen
     def draw(self, surface):
         surface.fill(white)
         #draw figlet surface here in the center
@@ -105,10 +108,12 @@ class StartScreen(Screen):
                                 self.button_rect.centery - btn_text.get_height()//2))
 
 
+#This is where we take the input sequence. It accounts for if the characters entered are amino acids.
 # -------------------------------
 # Game Screen (takes one input)
 # -------------------------------
 class GameScreen(Screen):
+    #what's in this type of screen
     def __init__(self, manager, inputs):
         self.manager = manager
         self.input_box = pygame.Rect(WIDTH//2 - 100, HEIGHT//2 + 200, 200, 50)
@@ -116,34 +121,39 @@ class GameScreen(Screen):
         self.user_text = ""
         self.inputs = inputs
         self.MAX_COUNT = 3
-
+    #handling inputs for input. Also takes in only amino acid sequences
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.active = self.input_box.collidepoint(event.pos)
 
         if event.type == pygame.KEYDOWN and self.active:
+            valid_amino_acids = set("ACDEFGHIKLMNPQRSTVWY")
             if event.key == pygame.K_RETURN:
                 # Only take one input, must be exactly 5 alphabets
-                if len(self.user_text) == 5 and self.user_text.isalpha():
+                if len(self.user_text) == 5 and all(c in valid_amino_acids for c in self.user_text.upper()):
                     self.inputs.append(self.user_text.upper())
                     self.manager.set_screen(ResultScreen(self.manager, self.inputs))
+            #backspaces
             elif event.key == pygame.K_BACKSPACE:
                 self.user_text = self.user_text[:-1]
-            elif len(self.user_text) < 5 and event.unicode.isalpha():
+            #if its lesser than five, allows for more input
+            elif len(self.user_text) < 5 and event.unicode.upper() in valid_amino_acids:
                 self.user_text += event.unicode
-
+    #show stuff on screen
     def draw(self, surface):
+        #background color
         surface.fill(white)
+        #active is if mouse clicks within the box for input
         color = blue if self.active else gray
         pygame.draw.rect(surface, color, self.input_box, border_radius=10)
 
-        #print type in sequence above box
+        #print type in sequence above input box
         label_text = small_font.render("Type in sequence", True, black)
         label_x = self.input_box.centerx - label_text.get_width() // 2
         label_y = self.input_box.top - 50
         surface.blit(label_text, (label_x, label_y))
 
-        # Draw current text
+        # Draw display text onto screen
         txt_surface = small_font.render(self.user_text.upper(), True, black)
         # surface.blit(txt_surface, (self.input_box.x + 20, self.input_box.y + 10))
         surface.blit(txt_surface, (self.input_box.centerx - txt_surface.get_width()//2,
@@ -154,17 +164,27 @@ class GameScreen(Screen):
         count_text = small_font.render(f"Try {count + 1} of {self.MAX_COUNT}", True, black)
         surface.blit(count_text, (50, 50))
 
-
+#Add stuff here for visualization in result page- LIKE GRAPHS.
 # -------------------------------
 # Result Screen (after each input)
 # -------------------------------
 class ResultScreen(Screen):
+    #what's on the result screen? if you're including graphs, include the variable here because it needs to exist here!!
     def __init__(self, manager, inputs):
         self.manager = manager
         self.inputs = inputs
         self.button_rect = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)
+        
+        #getting input from previous screen
+        if inputs:
+            self.last_input = inputs[-1]
+            #call functions here!!
+        else:
+            self.last_input = ""
+            self.result1 = 0
+            self.result2 = 0
 
-
+    #type of input- currently i just have a next button but we can change that
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.button_rect.collidepoint(event.pos):
@@ -172,12 +192,17 @@ class ResultScreen(Screen):
                 if len(self.inputs) < 3:
                     self.manager.set_screen(GameScreen(self.manager, self.inputs))
                 else:
-                    # End of game – show final results (stay here)
+                    #score
+                    #visualize result
+                    # won = total_result == 0  negative sum = lose?
+                    #self.manager.set_screen(GameOverScreen(self.manager, won))
+                    #lost= total_result ==None
                     pass
-
+    
+    #drawing stuff to surface- for now it just shows you the string input. We need to change this!               
     def draw(self, surface):
         surface.fill(white)
-        title = font.render("Result Screen", True, black)
+        title = font.render("Traverse the Peak", True, black)
         surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
 
         y = 220
@@ -188,13 +213,19 @@ class ResultScreen(Screen):
 
         # Draw Next button unless finished
         if len(self.inputs) < 3:
-            pygame.draw.rect(surface, blue, self.button_rect, border_radius=10)
+            pygame.draw.rect(surface, BLUE, self.button_rect, border_radius=10)
             btn_text = small_font.render("Next", True, white)
-            surface.blit(btn_text, (self.button_rect.centerx - btn_text.get_width()//2,
-                                    self.button_rect.centery - btn_text.get_height()//2))
-        else:
-            done_text = small_font.render("All 3 inputs completed!", True, blue)
-            surface.blit(done_text, (WIDTH//2 - done_text.get_width()//2, HEIGHT - 130))
+            surface.blit(btn_text, (
+                self.button_rect.centerx - btn_text.get_width() // 2,
+                self.button_rect.centery - btn_text.get_height() // 2
+            ))
+        # else:
+        #     end_text = small_font.render("Click to see final result", True, blue)
+        #     surface.blit(end_text, (WIDTH // 2 - end_text.get_width() // 2, HEIGHT - 130))
+
+#--------------------------------
+# Game over screen class
+#--------------------------------
 
 
 # -------------------------------
