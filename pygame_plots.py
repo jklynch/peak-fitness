@@ -16,11 +16,11 @@ inst_font = pg.font.SysFont('Arial', 20)
 inst3 = inst_font.render(f"Try to improve the score to reach the peak!", True, (0, 0, 0))
 inst4 = inst_font.render(f"You have 5 tries.", True, (0, 0, 0))
 
-# defines elements to show on screen VVV
+# defines elements to show on screen VVV ------------------------
 
-size = width, height = 640, 480
-width = 640
-height = 480
+size = width, height = 1280, 720
+width = 1280
+height = 720
 screen = pg.display.set_mode(size)
 
 #title_rect = title.get_rect(center=(width/2, height/2))
@@ -28,28 +28,66 @@ screen = pg.display.set_mode(size)
 #inst2_rect = inst2.get_rect(center=(width/2, height/1.5))
 #inst3_rect = inst3.get_rect(center=(width/2, height/1.6))
 #inst4_rect = inst4.get_rect(center=(width/2, height/1.7))
+# -------------------------------------------------------------
 
-    #wait for input 
+#define a rectangle for plot
+#plotrect1 = pg.draw.rect(screen, (0,0,255), [100,100,400,100],)
 
-def inputseqfunc():
-    inputseq=''
-    text1(f'Please enter a sequence of length {input_seq_length}', 300,400) #asks for seq
-    pygame.display.flip()
-    done = True
+#ciricle1 = pg.draw.circle(plot_rectangle1, 10, (10,10), 10)
+
+
+# ------------------------------------------------------------
 
 color = 135, 206, 235
 
 # pg.display.set_caption("REACH THE PEAK!")
 
-# Displays defined elements VVV -----------------
+# Defines elements ------------------------------------------------
+
+plotheight = 500 #saved in a variable to futureproof y value formula in plot
+plotwidth = 1180 #same as above
+plotrect = pg.Surface((plotwidth,plotheight)) #creating plot bg
+plotrect.fill((255,255,255)) #coloring plot bg
+
+# ---------------------------
+
+#simulating or adding all seq count here, TEMP!!! -------------------
+
+#seqs_scores = {'AAA':0,'CCC':-1,'TTT':-2,'GGG':-3,'DDD':-4,'PPP':-5,'AAC':-6,'AGG':-7, 'GGC':-8, 'GAG':-9, 'AGE':-10, 'TAT':-11, 'TTA':-12}
+
+import Peak #Also TEMP!!!
+seqs_scores, peak_seq = Peak.main() #full list, not used later
+seqs_scores_list = list(seqs_scores.keys())
+# --------------------------------------------------------------------
+
+# This is the part that has changed from the pygame_title script -----
+
+
+xval = 0 #used for x value in plots
+flowcontrolplot1 = 0 #used to make things happen ONCE in the loop
+
+min_score_val = seqs_scores[min(seqs_scores, key=seqs_scores.get)] #finds lowest value in dictionary
+max_score_val = seqs_scores[max(seqs_scores, key=seqs_scores.get)] #finds highest value in dictionary
+min_index_val = 0
+max_index_val = len(seqs_scores_list)
+
+#Make Peak stand out !!!
 
 while True:
-    for event in pg.event.get():
-        if event.type == pg.QUIT: sys.exit()
+	for event in pg.event.get():
+		if event.type == pg.QUIT: sys.exit()
 
-    screen.fill(color)
-    
-	#screen.blit(inst4, inst4_rect)
-    pg.display.flip()
-    
-    
+	screen.fill(color) #fills background with color
+	
+	screen.blit(plotrect, (50,50))
+	for seq in seqs_scores:
+		if flowcontrolplot1 == 0: # Prevents points being added forever
+			yval = seqs_scores[seq] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
+			xval =  seqs_scores_list.index(seq) / (max_index_val - min_index_val) * plotwidth #converts sequence index to the X value in plot
+			pg.draw.circle(plotrect, color=(0,0,0), center=(xval,yval), radius=3)
+	flowcontrolplot1 = 1
+	if flowcontrolplot1 == 1:
+		pg.draw.circle(plotrect, color=(0,0,0), center=(seqs_scores_list.index(peak_seq),max_score_val), radius=3)
+		flowcontrolplot1 = 2
+	pg.display.flip() # Accumulates and renders ALL elements
+	
