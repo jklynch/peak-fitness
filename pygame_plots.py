@@ -16,38 +16,40 @@ inst_font = pg.font.SysFont('Arial', 20)
 inst3 = inst_font.render(f"Try to improve the score to reach the peak!", True, (0, 0, 0))
 inst4 = inst_font.render(f"You have 5 tries.", True, (0, 0, 0))
 
+# defines elements to show on screen VVV
 
 size = width, height = 640, 480
 width = 640
 height = 480
 screen = pg.display.set_mode(size)
-title_rect = title.get_rect(center=(width/2, height/2))
-inst1_rect = inst1.get_rect(center=(width/2, height/1.4))
-inst2_rect = inst2.get_rect(center=(width/2, height/1.5))
-inst3_rect = inst3.get_rect(center=(width/2, height/1.6))
-inst4_rect = inst4.get_rect(center=(width/2, height/1.7))
 
-color = 135, 206, 235
+#title_rect = title.get_rect(center=(width/2, height/2))
+#inst1_rect = inst1.get_rect(center=(width/2, height/1.4))
+#inst2_rect = inst2.get_rect(center=(width/2, height/1.5))
+#inst3_rect = inst3.get_rect(center=(width/2, height/1.6))
+#inst4_rect = inst4.get_rect(center=(width/2, height/1.7))
 
-# pg.display.set_caption("REACH THE PEAK!")
-
-while True:
-    for event in pg.event.get():
-        if event.type == pg.QUIT: sys.exit()
-
-    screen.fill(color)
-    screen.blit(title, title_rect)
-    screen.blit(inst1, inst1_rect)
-    screen.blit(inst2, inst2_rect)
-    screen.blit(inst3, inst3_rect)
-    screen.blit(inst4, inst4_rect)
-    pg.display.flip()
-    
-#Wait for Input --------------------------------------------------
+    #wait for input 
 
 def inputseqfunc():
     inputseq=''
     text1(f'Please enter a sequence of length {input_seq_length}', 300,400) #asks for seq
     pygame.display.flip()
     done = True
-    for
+
+color = 135, 206, 235
+
+# pg.display.set_caption("REACH THE PEAK!")
+
+# Displays defined elements VVV -----------------
+
+while True:
+    for event in pg.event.get():
+        if event.type == pg.QUIT: sys.exit()
+
+    screen.fill(color)
+    
+	#screen.blit(inst4, inst4_rect)
+    pg.display.flip()
+    
+    
