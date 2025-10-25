@@ -22,10 +22,10 @@ width = 640
 height = 480
 screen = pg.display.set_mode(size)
 title_rect = title.get_rect(center=(width/2, height/2))
-inst1_rect = inst1.get_rect(center=(width/2, height/1.5))
-inst2_rect = inst2.get_rect(center=(width/2, height/1.55))
+inst1_rect = inst1.get_rect(center=(width/2, height/1.4))
+inst2_rect = inst2.get_rect(center=(width/2, height/1.5))
 inst3_rect = inst3.get_rect(center=(width/2, height/1.6))
-inst4_rect = inst4.get_rect(center=(width/2, height/1.65))
+inst4_rect = inst4.get_rect(center=(width/2, height/1.7))
 
 color = 135, 206, 235
 
