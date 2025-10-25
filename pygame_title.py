@@ -5,29 +5,29 @@ import pygame as pg
 pg.init()
 pg.font.init()
 #each text is in its own rectangle
-title_font = pg.font.SysFont('Arial', 40)
-title = title_font.render('Reach the peak!', True, (0, 0, 0))
+title_font = pg.font.SysFont('Comic Sans MS', 50)
+title = title_font.render('Reach the peak!', True, (51, 0, 102))
 # (0,0,0) is for black font
 inst_font = pg.font.SysFont('Arial', 20)
-inst1 = inst_font.render(f"Can you figure out the most fit pentapeptide?", True, (0, 0, 0))
+inst1 = inst_font.render(f"Can you discover the most fit pentapeptide?", True, (96, 96, 96))
 inst_font = pg.font.SysFont('Arial', 20)
-inst2 = inst_font.render(f"Enter a starting sequence (5-mer) and get its fitness score.", True, (0, 0, 0))
+inst2 = inst_font.render(f"Enter a starting sequence (5-mer) and get its fitness score.", True, (96, 96, 96))
 inst_font = pg.font.SysFont('Arial', 20)
-inst3 = inst_font.render(f"Try to improve the score to reach the peak!", True, (0, 0, 0))
-inst4 = inst_font.render(f"You have 5 tries.", True, (0, 0, 0))
+inst3 = inst_font.render(f"Improve the score to reach the peak!", True, (96, 96, 96))
+inst4 = inst_font.render(f"You have 5 tries.", True, (96, 96, 96))
 
 
 size = width, height = 640, 480
 width = 640
 height = 480
 screen = pg.display.set_mode(size)
-title_rect = title.get_rect(center=(width/2, height/2))
-inst1_rect = inst1.get_rect(center=(width/2, height/1.4))
-inst2_rect = inst2.get_rect(center=(width/2, height/1.5))
-inst3_rect = inst3.get_rect(center=(width/2, height/1.6))
-inst4_rect = inst4.get_rect(center=(width/2, height/1.7))
+title_rect = title.get_rect(center=(width/2, height/2.2))
+inst1_rect = inst1.get_rect(center=(width/2, height/1.7))
+inst2_rect = inst2.get_rect(center=(width/2, height/1.6))
+inst3_rect = inst3.get_rect(center=(width/2, height/1.5))
+inst4_rect = inst4.get_rect(center=(width/2, height/1.4))
 
-color = 135, 206, 235
+color = 204, 229, 255
 
 # pg.display.set_caption("REACH THE PEAK!")
 
