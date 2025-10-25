@@ -2,52 +2,79 @@
 import sys
 import pygame as pg
 
+#initialize pygame
 pg.init()
 pg.font.init()
-#each text is in its own rectangle
-title_font = pg.font.SysFont('Comic Sans MS', 50)
-title = title_font.render('Reach the peak!', True, (51, 0, 102))
+done = False
+#add the welcome message, note - 
+#each text is in its own rectangle - we couldn't figure out how to do line breaks or center alignment
 # (0,0,0) is for black font
-inst_font = pg.font.SysFont('Arial', 20)
-inst1 = inst_font.render(f"Can you discover the most fit pentapeptide?", True, (96, 96, 96))
-inst_font = pg.font.SysFont('Arial', 20)
-inst2 = inst_font.render(f"Enter a starting sequence (5-mer) and get its fitness score.", True, (96, 96, 96))
-inst_font = pg.font.SysFont('Arial', 20)
-inst3 = inst_font.render(f"Improve the score to reach the peak!", True, (96, 96, 96))
-inst4 = inst_font.render(f"You have 5 tries.", True, (96, 96, 96))
+# font for all of the instructions
 
+title_font = pg.font.SysFont('Comic Sans MS',60)
+inst_font = pg.font.SysFont('Arial', 20)
+seq_font = pg.font.SysFont('Arial', 30)
+title = title_font.render('Reach the peak!', True, (51, 0, 102))
+#asks for seq
+text1 = seq_font.render(f'Type your sequence:', True, (51, 0, 102)) 
 
-size = width, height = 640, 480
-width = 640
-height = 480
+instructions = [
+    "Can you discovery the most fit pentapeptide?",
+    "Enter a starting sequence (5-mer)",
+    "and get its fitness score.",
+    "Improve the score to reach the peak!",
+    "You have 5 tries."
+]
+#this function takes the lines above and then center aligns the text
+def draw_centered_text(screen, lines, font, color, start_y, line_spacing=10):
+    total_height = sum(font.size(line)[1] + line_spacing for line in lines) - line_spacing
+    y = start_y - total_height  # start so that all lines are vertically centered around start_y
+    for line in lines:
+        text_surface = font.render(line, True, color)
+        text_rect = text_surface.get_rect(center=(screen.get_width() // 2, y + font.get_height() // 2))
+        screen.blit(text_surface, text_rect)
+        y += font.get_height() + line_spacing
+
+#set display
+size = width, height = 1280, 720
+width = 1280
+height = 720
 screen = pg.display.set_mode(size)
-title_rect = title.get_rect(center=(width/2, height/2.2))
-inst1_rect = inst1.get_rect(center=(width/2, height/1.7))
-inst2_rect = inst2.get_rect(center=(width/2, height/1.6))
-inst3_rect = inst3.get_rect(center=(width/2, height/1.5))
-inst4_rect = inst4.get_rect(center=(width/2, height/1.4))
+
+title_rect = title.get_rect(center=(width/2, height/3.2))
+text1_rect = text1.get_rect(center=(width/4, height/1.3))
 
 color = 204, 229, 255
+inputseq = ''
 
-# pg.display.set_caption("REACH THE PEAK!")
+# #Wait for Input --------------------------------------------------
 
-while True:
+while not done:
+    #this is an infinite loop... until player types quit
     for event in pg.event.get():
-        if event.type == pg.QUIT: sys.exit()
+        if event.type == pg.QUIT: 
+            done = True
+        if event.type == pg.KEYDOWN: #this records the keystrokes
+            if event.key == pg.K_BACKSPACE:
+                #handle backspace
+                inputseq = inputseq[:-1]
+            elif event.key == pg.K_ESCAPE:
+                pg.quit()
+                sys.exit()
+            elif event.key == pg.K_RETURN:  # Handle Enter key
+                print(f"Sequence submitted: {inputseq}")
+                submitted_text = inputseq  # store the submitted string
+                inputseq = ""
+            else: #this adds a chracter to the inputseq
+                inputseq += event.unicode
 
     screen.fill(color)
     screen.blit(title, title_rect)
-    screen.blit(inst1, inst1_rect)
-    screen.blit(inst2, inst2_rect)
-    screen.blit(inst3, inst3_rect)
-    screen.blit(inst4, inst4_rect)
+    draw_centered_text(screen, instructions, inst_font, (96, 96, 96), 450, line_spacing=10)
+    screen.blit(text1, text1_rect)
+    seq = seq_font.render(inputseq, True, (51, 0, 102))
+    seq_rect = text1.get_rect(center=(width/2, height/1.3))
+    screen.blit(seq, seq_rect)
     pg.display.flip()
-    
-#Wait for Input --------------------------------------------------
 
-def inputseqfunc():
-    inputseq=''
-    text1(f'Please enter a sequence of length {input_seq_length}', 300,400) #asks for seq
-    pygame.display.flip()
-    done = True
-    for
+#Push input sequence to top corner along with attempts
