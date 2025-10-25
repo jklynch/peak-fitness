@@ -15,8 +15,8 @@ def count_score(peak,seq):
         raise ValueError('Input should be string')
     if not (set(peak).issubset(set_AA) or set(seq).issubset(set_AA)):
         raise ValueError("Invalid characters in sequence")
-    if len(peak)!=len(seq):
-        raise ValueError('Sequences must be the same length')
+    # if len(peak)!=len(seq):
+    #     raise ValueError('Sequences must be the same length')
     
     peak=peak.upper()
     seq=seq.upper()
@@ -34,6 +34,7 @@ def count_score(peak,seq):
                 score+=matrix[(aa_1,aa_2)]- 3
             except:
                 score+=matrix[(aa_2,aa_1)] - 3
+                print(i)
     return score
 
 ##Tests -------------------------------------------------------
