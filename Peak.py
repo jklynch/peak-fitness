@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pyfiglet import Figlet
+#from pyfiglet import Figlet
 import generate_all_seq, count_seq, random, time
 
 #variables available
@@ -11,43 +11,27 @@ import generate_all_seq, count_seq, random, time
 #temporary solution ------------------------------------
 
 if True:
-	input_seq_length = 5
+	input_seq_length = 3
 
 # ---------------------------------------------------
 
 def main():
 
-	peakmsg = Figlet(font='ticks')
-	print(peakmsg.renderText('Peak'))
+	#peakmsg = Figlet(font='ticks')
+	#print(peakmsg.renderText('Peak'))
 
 	all_seqs = generate_all_seq.generate_all_seqs(input_seq_length) # save list of all sequences
 
 	peak_seq = all_seqs[random.randint(0,len(all_seqs))] # determine the peak sequence
 
+	##define a dictionary that will score all of the sequences as keys and their scores as values
+	seqs_scores= {}
+	for seq in all_seqs:
+		seqs_scores[seq]= count_seq.count_score(peak_seq,seq)
+
+
+	print(max(seqs_scores.values()))
+	print(peak_seq)
 	
-	#wait for input 
-
-def inputseqfunc():
-	inputseq=''
-	text1(f'Please enter a sequence of length {input_seq_length}', 300,400) #asks for seq
-	pygame.display.flip()
-	done = True
-	for 
-
-
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()

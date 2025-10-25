@@ -28,5 +28,5 @@ def test_peak_seq():
         return
     assert False, "expected ValueError"
 
-seq_length = int(sys.argv[1]) # could replace this with a specific number
-print(f"peak sequence: {peak_seq(seq_length)}")
+#seq_length = int(sys.argv[1]) # could replace this with a specific number
+#print(f"peak sequence: {peak_seq(seq_length)}")

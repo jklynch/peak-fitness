@@ -30,9 +30,10 @@ def count_score(peak,seq):
             continue
         else:
             try:
-                score+=matrix[(aa_1,aa_2)]
+                #subtracting 3 to everything that is not identical to the value
+                score+=matrix[(aa_1,aa_2)]- 3
             except:
-                score+=matrix[(aa_2,aa_1)]
+                score+=matrix[(aa_2,aa_1)] - 3
     return score
 
 ##Tests -------------------------------------------------------
