@@ -27,8 +27,9 @@ def main():
 	##define a dictionary that will score all of the sequences as keys and their scores as values
 	seqs_scores= {}
 	for seq in all_seqs[::100]:
-			seqs_scores[seq]= count_seq.count_score(peak_seq,seq)
-	
+		seqs_scores[seq]= count_seq.count_score(peak_seq,seq)
+	sorted(seqs_scores)
+			
 	return seqs_scores, peak_seq
 	
 if __name__ == '__main__':
