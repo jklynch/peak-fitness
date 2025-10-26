@@ -92,10 +92,12 @@ class StartScreen(Screen):
         
         #adding instructions to be printed
         self.subtitle_lines = [
-            "Can you discover the most fit pentapeptide?",
+            "Can you discover the fittest pentapeptide?",
             "Enter a starting sequence (5-mer)",
             "and get its fitness score.",
-            "Improve the score to reach the peak!",
+            "Mutate the sequence to improve the score",
+            "You win if you guess the most fit peptide!",
+            "Think about the amino acid classes",
             "You have 5 tries.",
             ]
         
@@ -172,11 +174,11 @@ class StartScreen(Screen):
         )
         
         #print instructions
-        y = HEIGHT // 2
+        y = HEIGHT // 2.2
         for line in self.subtitle_lines:
             txt = small_font.render(line, True, white)
             surface.blit(txt, (WIDTH // 2 - txt.get_width() // 2, y))
-            y += 50
+            y += 30
         
         #draw next button to screen at the bottom
         pygame.draw.rect(surface, green, self.button_rect, border_radius=10)
@@ -257,11 +259,17 @@ class GameScreen(Screen):
         
         #Display previous guesses
         peak=self.manager.peak
-        y = 40
+        y = 50
         for i, text in enumerate(self.inputs):
             score = count_seq.count_score(peak, text)
-            line = small_font.render(f"Input {i+1}: {text}. Score:{score}", True, black)
-            surface.blit(line, (20, y))
+            # Create the colored text for this guess
+            for j, char in enumerate(text):
+                color = green if char == peak[j] else black
+                letter_surface = small_font.render(char, True, color)
+                surface.blit(letter_surface, (20 + j * 30, y))
+                final_val=20 + j * 30
+            line = small_font.render(f'Score:{score}', True, black)
+            surface.blit(line, (final_val+30, y))
             y += 30
 
         # Display count info (how many tries are left)
@@ -317,12 +325,27 @@ class ResultScreen(Screen):
         surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
         peak=self.manager.peak
         
-        y = 40
+        y = 50
         for i, text in enumerate(self.inputs):
             score = count_seq.count_score(peak, text)
-            line = small_font.render(f"Input {i+1}: {text}. Score:{score}", True, black)
-            surface.blit(line, (20, y))
+            # Create the colored text for this guess
+            for j, char in enumerate(text):
+                color = green if char == peak[j] else black
+                letter_surface = small_font.render(char, True, color)
+                surface.blit(letter_surface, (20 + j * 30, y))
+                final_val=20 + j * 30
+            line = small_font.render(f'Score:{score}', True, black)
+            surface.blit(line, (final_val+30, y))
             y += 30
+        
+        # score_title=small_font.render('Scores',True, black)
+        # surface.blit(score_title,(1000, 40))
+       
+        # for i, text in enumerate(self.inputs):
+        #     score = count_seq.count_score(peak, text)
+        #     line = small_font.render(score, True, black)
+        #     surface.blit(line, (1000, y))
+        #     y += 30
 
 #Plots - - - -
         for seq in seqs_scores:
@@ -337,7 +360,7 @@ class ResultScreen(Screen):
         for seq,color in zip (plot_guess_dict.keys(), input_seq_colors):
             yval = plot_guess_dict[seq][0] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
             xval = plot_guess_dict[seq][1] / (max_index_val - min_index_val) * plotwidth #!!!!!!!!! Using a random number here for input in this case which I dont like
-            print(f'This is the input seq score {plot_guess_dict[seq][0]} x value {xval}, this is the y value {yval}, this is the peak {peak_sequence}')
+            # print(f'This is the input seq score {plot_guess_dict[seq][0]} x value {xval}, this is the y value {yval}, this is the peak {peak_sequence}')
             pygame.draw.circle(plotrect, color=(0,color,0), center=(xval,yval), radius=10)
 
         # Draw Next button unless finished
