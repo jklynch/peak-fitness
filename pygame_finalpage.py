@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 #Oct 25, 2025 Vivian Li
-##takes the score and if score is None (lost), the better ending screen is different than
-##if the score is an integer between 1-5
+##takes the count and if count is None (lost), the better ending screen is different than
+##if the count is an integer between 1-5
 
 import pygame
 import sys
@@ -25,8 +25,8 @@ WHITE = (255, 255, 255)
 font_large = pygame.font.SysFont("Arial", 72)
 font_medium = pygame.font.SysFont("Arial", 36)
 
-##enter how many tries it took for user to win aka score
-def display_end_screen(message, score=None):
+##enter how many tries it took for user to win aka count
+def display_end_screen(message, count=None):
     running = True
     while running:
         for event in pygame.event.get():
@@ -44,16 +44,16 @@ def display_end_screen(message, score=None):
         text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50))
         screen.blit(text_surface, text_rect)
 
-        # Render score (if provided)
-        if score is not None:
-            score_text = font_medium.render(f"You won in {score} tries", True, BLUE)
-            score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
-            screen.blit(score_text, score_rect)
+        # Render count (if provided)
+        if coun_rect is not None:
+            coun_rect_text = font_medium.render(f"You won in {coun_rect} tries", True, BLUE)
+            coun_rect_rect = coun_rect_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
+            screen.blit(coun_rect_text, coun_rect_rect)
 
-        if score is None:
-            score_text = font_medium.render(f"Better luck next time!", True, BLUE)
-            score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
-            screen.blit(score_text, score_rect)
+        if coun_rect is None:
+            coun_rect_text = font_medium.render(f"Better luck next time!", True, BLUE)
+            coun_rect_rect = coun_rect_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
+            screen.blit(coun_rect_text, coun_rect_rect)
 
 
         # Render instruction text
@@ -66,7 +66,7 @@ def display_end_screen(message, score=None):
 # Example usage:
 # Simulate game over after some time
 #pygame.time.wait(2000)  # Wait for 2 seconds
-display_end_screen("GAME OVER!", score=None)
+display_end_screen("GAME OVER!", coun_rect=3)
 
 # After the end screen, you could potentially restart the game or quit
 # For this example, we'll just quit after the end screen loop finishes
