@@ -274,6 +274,10 @@ class ResultScreen(Screen):
                 # If less than 3 inputs, go back to Game Screen
                 if len(self.inputs) < 5:
                     self.manager.set_screen(GameScreen(self.manager, self.inputs))
+                    if self.score ==0:
+                        self.manager.set_screen(GameOverScreen(self.manager, self.inputs))
+                    else:
+                        self.manager.set_screen(GameScreen(self.manager, self.inputs))
                 if len(self.inputs)==5:
                     self.manager.set_screen(GameOverScreen(self.manager, self.inputs))
             
