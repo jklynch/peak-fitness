@@ -88,9 +88,9 @@ def dict():
         value_list = [row['Score'], row['Activity']]
         
         if key not in dms_dict_withScore:
-            dms_dict_withScore[key] = []
-        
-        dms_dict_withScore[key].append(value_list)
+            dms_dict_withScore[key] = [value_list]
+        #else:
+            #dms_dict_withScore[key].append(value_list)
 
     return dms_dict_withScore
 
