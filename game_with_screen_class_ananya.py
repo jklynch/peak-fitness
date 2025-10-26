@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 PYGAME_DETECT_AVX2=1
-import pygame, sys, pyfiglet, random, count_seq, peak_seq
+import pygame
+import sys
+import pyfiglet
+import count_seq
 from Bio.Align import substitution_matrices
+import random
+import peak_seq
 
 pygame.init()
 pygame.font.init()
