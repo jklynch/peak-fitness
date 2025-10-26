@@ -5,6 +5,8 @@ import sys
 import pyfiglet
 import count_seq
 from Bio.Align import substitution_matrices
+import random
+import peak_seq
 
 pygame.init()
 pygame.font.init()
@@ -124,9 +126,9 @@ class GameScreen(Screen):
         self.active = False
         self.user_text = ""
         self.inputs = inputs
-        self.MAX_COUNT = 3
+        self.MAX_COUNT = 5
         
-    #handling inputs for input. Also takes in only amino acid sequences
+    #handling inputs for input. Also takes in only amino acid sequences - automatically makes them uppercase
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.active = self.input_box.collidepoint(event.pos)
@@ -141,7 +143,6 @@ class GameScreen(Screen):
             #backspaces
             elif event.key == pygame.K_BACKSPACE:
                 self.user_text = self.user_text[:-1]
-            #if its lesser than five, allows for more input
             elif len(self.user_text) < 5 and event.unicode.upper() in valid_amino_acids:
                 self.user_text += event.unicode
     #show stuff on screen
@@ -152,19 +153,19 @@ class GameScreen(Screen):
         color = blue if self.active else gray
         pygame.draw.rect(surface, color, self.input_box, border_radius=10)
 
-        #print type in sequence above input box
+        #fonts for the label for the input box
         label_text = small_font.render("Type in sequence", True, black)
         label_x = self.input_box.centerx - label_text.get_width() // 2
         label_y = self.input_box.top - 50
         surface.blit(label_text, (label_x, label_y))
 
-        # Draw display text onto screen
+        # Draw box to enter onto screen
         txt_surface = small_font.render(self.user_text.upper(), True, black)
         # surface.blit(txt_surface, (self.input_box.x + 20, self.input_box.y + 10))
         surface.blit(txt_surface, (self.input_box.centerx - txt_surface.get_width()//2,
                                     self.input_box.centery - txt_surface.get_height()//2))
 
-        # Display count info
+        # Display count info (how many tries are left)
         count = len(self.inputs)
         count_text = small_font.render(f"Try {count + 1} of {self.MAX_COUNT}", True, black)
         surface.blit(count_text, (50, 50))
@@ -182,21 +183,21 @@ class ResultScreen(Screen):
         
         #getting input from previous screen
         if inputs:
-            self.peak = 'AAAAA'
+            peak = self.manager.peak
             self.last_input = inputs[-1]
-            self.score = count_seq.count_score(self.peak, self.last_input)
-            #call functions here!!
+            self.score = count_seq.count_score(peak, self.last_input)
+            print(peak) #this is just for checking the peak_seq function
         else:
             self.last_input = ""
             self.result1 = 0
             self.result2 = 0
 
-    #type of input- currently i just have a next button but we can change that
+    #type of input- currently just have a next button but we can change that
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.button_rect.collidepoint(event.pos):
                 # If less than 3 inputs, go back to Game Screen
-                if len(self.inputs) < 3:
+                if len(self.inputs) < 5:
                     self.manager.set_screen(GameScreen(self.manager, self.inputs))
                 else:
                     #score
@@ -206,7 +207,7 @@ class ResultScreen(Screen):
                     #lost= total_result ==None
                     pass
     
-    #drawing stuff to surface- for now it just shows you the string input. We need to change this!               
+    #drawing stuff to surface- for now it just shows you the string input and score. We need to add the plotting script!               
     def draw(self, surface):
         surface.fill(white)
         title = font.render("Traverse the Peak", True, black)
@@ -221,21 +222,112 @@ class ResultScreen(Screen):
             y += 70
 
         # Draw Next button unless finished
-        if len(self.inputs) < 3:
+        if len(self.inputs) < 5:
             pygame.draw.rect(surface, blue, self.button_rect, border_radius=10)
             btn_text = small_font.render("Next", True, white)
             surface.blit(btn_text, (
                 self.button_rect.centerx - btn_text.get_width() // 2,
                 self.button_rect.centery - btn_text.get_height() // 2
             ))
-        # else:
-        #     end_text = small_font.render("Click to see final result", True, blue)
-        #     surface.blit(end_text, (WIDTH // 2 - end_text.get_width() // 2, HEIGHT - 130))
+
+# -------------------------------
+# Result Screen (After attempt Number 5)
+# -------------------------------
+class Result_5_Screen(Screen):
+    #what's on the result screen? if you're including graphs, include the variable here because it needs to exist here!!
+    def __init__(self, manager, inputs):
+        self.manager = manager
+        self.inputs = inputs
+        self.button_rect = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)
+        
+        #getting input from previous screen
+        if inputs:
+            peak = self.manager.peak
+            self.last_input = inputs[-1]
+            self.score = count_seq.count_score(peak, self.last_input)
+            # print(peak) #this is just for checking the peak_seq function
+        else:
+            self.last_input = ""
+            self.result1 = 0
+            self.result2 = 0
+
+    #type of input- currently just have a next button but we can change that
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.button_rect.collidepoint(event.pos):
+                # If less than 3 inputs, go back to Game Screen
+                if len(self.inputs) < 5:
+                    self.manager.set_screen(GameScreen(self.manager, self.inputs))
+                else:
+                    #score
+                    #visualize result
+                    # won = total_result == 0  negative sum = lose?
+                    self.manager.set_screen(GameOverScreen(self.manager, won))
+                    #lost= total_result ==None
+                    # pass
+    
+    #drawing stuff to surface- for now it just shows you the string input and score. We need to add the plotting script!               
+    def draw(self, surface):
+        surface.fill(white)
+        title = font.render("Traverse the Peak", True, black)
+        surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
+        score = medium_font.render(f'Score: {self.score}', True, blue)
+        surface.blit(score, (20, 40))
+
+        y = 220
+        for i, text in enumerate(self.inputs):
+            line = small_font.render(f"Input {i+1}: {text}", True, black)
+            surface.blit(line, (WIDTH//2 - line.get_width()//2, y))
+            y += 70
+
+        # Draw Next button unless finished
+        if len(self.inputs) == 5:
+            end_text = small_font.render("Click to see final result", True, blue)
+            surface.blit(end_text, (WIDTH // 2 - end_text.get_width() // 2, HEIGHT - 130))
+        else:
+            pass
 
 #--------------------------------
 # Game over screen class
 #--------------------------------
+class GameOverScreen(Screen):
+    def __init__(self, manager, inputs):
+        self.manager = manager
+        self.inputs = inputs
+        
+        #getting input from previous screen
+        if inputs:
+            peak = self.manager.peak
+            self.last_input = inputs[-1]
+            self.score = count_seq.count_score(peak, self.last_input)
+            # print(peak) - this is just for checking the peak_seq function
+        else:
+            self.last_input = ""
+            self.result1 = 0
+            self.result2 = 0
 
+    #type of input- currently just have a next button but we can change that
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.button_rect.collidepoint(event.pos):
+                if self.score is not None:
+                    score_text = medium_font.render(f"You won in {len(self.imputs)} tries", True, blue)
+                    score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 20))
+                    screen.blit(score_text, score_rect)
+
+            if self.score is None:
+                score_text = medium_font.render(f"Better luck next time!", True, blue)
+                score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 20))
+                screen.blit(score_text, score_rect)
+
+    def draw(self, surface):
+        surface.fill(white)
+        title = font.render("Traverse the Peak", True, black)
+        surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
+        score = medium_font.render(f'Score: {self.score}', True, blue)
+        surface.blit(score, (20, 40))
+        small_font.render("Click to see final result", True, blue)
+        # surface.blit(end_text, (WIDTH // 2 - end_text.get_width() // 2, HEIGHT - 130))
 
 # -------------------------------
 # Screen Manager
@@ -243,6 +335,8 @@ class ResultScreen(Screen):
 class ScreenManager:
     def __init__(self):
         self.current_screen = StartScreen(self)
+        # select random peptide using peak_seq function from peak_seq.py
+        self.peak = peak_seq.peak_seq(5)
 
     def set_screen(self, screen):
         self.current_screen = screen
