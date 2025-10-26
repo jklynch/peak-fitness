@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 PYGAME_DETECT_AVX2=1
-import pygame, sys, pyfiglet, random, count_seq, peak_seq
+import pygame, sys, pyfiglet, random, count_seq, peak_seq, Peak
 from Bio.Align import substitution_matrices
 
 pygame.init()
@@ -32,6 +32,25 @@ light_green=(153,255,51)
 red=(255, 0, 0)
 
 clock = pygame.time.Clock()
+
+#
+# Plots - - - - 
+#
+plotheight = 500
+plotwidth = 1180
+plotrect = pygame.Surface((plotwidth,plotheight)) #creating plot bg
+plotrect.fill((255,255,255)) #coloring the plot
+xval = 0
+
+seqs_scores, peak_sequence = Peak.main() # ADDING THE FULL LIST OF AMINOACIDS, also outputs the peakseq which I will assign to _ to avoid an error
+seqs_scores_list = list(seqs_scores.keys())
+
+min_score_val = seqs_scores[min(seqs_scores, key=seqs_scores.get)] #finds lowest value in dictionary
+max_score_val = seqs_scores[max(seqs_scores, key=seqs_scores.get)] #finds highest value in dictionary
+min_index_val = 0
+max_index_val = len(seqs_scores_list)
+flowcontrolplot1 = -1
+plot_guess_dict = {}
 
 
 # -------------------------------
@@ -194,6 +213,13 @@ class GameScreen(Screen):
                 if len(self.user_text) == 5 and all(c in valid_amino_acids for c in self.user_text.upper()):
                     self.inputs.append(self.user_text.upper())
                     self.manager.set_screen(ResultScreen(self.manager, self.inputs))
+           
+                 #Dictionary of guesses for the plots
+                    global plot_guess_dict #Bad practice but it works
+                    for seq in self.inputs:
+                        if seq not in plot_guess_dict.keys():
+                            plot_guess_dict[seq] = [count_seq.count_score(peak_sequence, seq), random.randint(0,len(seqs_scores))]
+
             #backspaces
             elif event.key == pygame.K_BACKSPACE:
                 self.user_text = self.user_text[:-1]
@@ -209,7 +235,7 @@ class GameScreen(Screen):
         pygame.draw.rect(surface, color, self.input_box, border_radius=10)
 
          #amino acid image
-        og_image = pygame.image.load("amino acid chart.png").convert_alpha() 
+        og_image = pygame.image.load("amino acid classification.png").convert_alpha() 
         smaller_image = pygame.transform.scale(og_image, (600, 450))
 
         # Get the image's rectangle and position it
@@ -254,11 +280,11 @@ class ResultScreen(Screen):
         self.manager = manager
         self.inputs = inputs
         self.next = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)
-        self.see_result = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)
-        
+        self.see_result = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)      
+
         #getting input from previous screen
         if inputs:
-            peak = self.manager.peak
+            peak = peak_sequence
             self.last_input = inputs[-1]
             self.score = count_seq.count_score(peak, self.last_input)
             print(peak) #this is just for checking the peak_seq function
@@ -286,6 +312,7 @@ class ResultScreen(Screen):
     def draw(self, surface):
         
         surface.fill(white)
+        screen.blit(plotrect, (50,50))
         title = font.render("Traverse the Peak", True, black)
         surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
         peak=self.manager.peak
@@ -296,7 +323,23 @@ class ResultScreen(Screen):
             line = small_font.render(f"Input {i+1}: {text}. Score:{score}", True, black)
             surface.blit(line, (20, y))
             y += 30
-        
+
+#Plots - - - -
+        for seq in seqs_scores:
+            yval = seqs_scores[seq] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
+            xval =  seqs_scores_list.index(seq) / (max_index_val - min_index_val) * plotwidth #converts sequence index to the X value in plot
+            if seq == peak_sequence:
+                pygame.draw.circle(plotrect, color=(0,0,0), center=(xval,yval+20), radius=3)
+                pygame.draw.circle(plotrect, color=(255,0,0), center=(xval,yval+20), radius=10)
+            else:
+                pygame.draw.circle(plotrect, color=(0,0,0), center=(xval,yval), radius=3)
+        input_seq_colors = [250, 200, 150, 100, 50]
+        for seq,color in zip (plot_guess_dict.keys(), input_seq_colors):
+            yval = plot_guess_dict[seq][0] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
+            xval = plot_guess_dict[seq][1] / (max_index_val - min_index_val) * plotwidth #!!!!!!!!! Using a random number here for input in this case which I dont like
+            print(f'This is the input seq score {plot_guess_dict[seq][0]} x value {xval}, this is the y value {yval}, this is the peak {peak_sequence}')
+            pygame.draw.circle(plotrect, color=(0,color,0), center=(xval,yval), radius=10)
+
         # Draw Next button unless finished
         if len(self.inputs) < 5:
             pygame.draw.rect(surface, blue, self.next, border_radius=10)
@@ -328,7 +371,7 @@ class GameOverScreen(Screen):
         
         #getting input from previous screen
         if inputs:
-            peak = self.manager.peak
+            peak = peak_sequence
             self.last_input = inputs[-1]
             self.score = count_seq.count_score(peak, self.last_input)
             # print(peak) - this is just for checking the peak_seq function
@@ -406,7 +449,7 @@ class ScreenManager:
     def __init__(self):
         self.current_screen = StartScreen(self)
         # select random peptide using peak_seq function from peak_seq.py
-        self.peak = peak_seq.peak_seq(5)
+        self.peak = peak_sequence
         self.current_screen.enter() 
     
     def set_screen(self, screen):
