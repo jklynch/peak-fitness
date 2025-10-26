@@ -7,6 +7,7 @@ import count_seq
 from Bio.Align import substitution_matrices
 import random
 import peak_seq
+import math
 
 pygame.init()
 pygame.font.init()
@@ -220,9 +221,12 @@ class ResultScreen(Screen):
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.next.collidepoint(event.pos):
-                # If less than 3 inputs, go back to Game Screen
+                # If less than 5 inputs, go back to Game Screen
                 if len(self.inputs) < 5:
-                    self.manager.set_screen(GameScreen(self.manager, self.inputs))
+                    if self.score ==0:
+                        self.manager.set_screen(GameOverScreen(self.manager, self.inputs))
+                    else:
+                        self.manager.set_screen(GameScreen(self.manager, self.inputs))
                 if len(self.inputs)==5:
                     self.manager.set_screen(GameOverScreen(self.manager, self.inputs))
             
@@ -292,7 +296,6 @@ class GameOverScreen(Screen):
 
 
     def draw(self, surface):
-        
         surface.fill(black)
         title = font.render("Traverse the Peak", True, white)
         surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))

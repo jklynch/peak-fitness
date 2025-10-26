@@ -45,15 +45,15 @@ def display_end_screen(message, count=None):
         screen.blit(text_surface, text_rect)
 
         # Render count (if provided)
-        if coun_rect is not None:
-            coun_rect_text = font_medium.render(f"You won in {coun_rect} tries", True, BLUE)
-            coun_rect_rect = coun_rect_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
-            screen.blit(coun_rect_text, coun_rect_rect)
+        if count_rect is not None:
+            count_rect_text = font_medium.render(f"You won in {count_rect} tries", True, BLUE)
+            count_rect_rect = count_rect_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
+            screen.blit(count_rect_text, count_rect_rect)
 
-        if coun_rect is None:
-            coun_rect_text = font_medium.render(f"Better luck next time!", True, BLUE)
-            coun_rect_rect = coun_rect_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
-            screen.blit(coun_rect_text, coun_rect_rect)
+        if count_rect is None:
+            count_rect_text = font_medium.render(f"Better luck next time!", True, BLUE)
+            count_rect_rect = count_rect_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
+            screen.blit(count_rect_text, count_rect_rect)
 
 
         # Render instruction text
@@ -66,7 +66,7 @@ def display_end_screen(message, count=None):
 # Example usage:
 # Simulate game over after some time
 #pygame.time.wait(2000)  # Wait for 2 seconds
-display_end_screen("GAME OVER!", coun_rect=3)
+display_end_screen("GAME OVER!", count_rect=3)
 
 # After the end screen, you could potentially restart the game or quit
 # For this example, we'll just quit after the end screen loop finishes
