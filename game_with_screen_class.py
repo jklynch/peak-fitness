@@ -13,12 +13,13 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Peak fitness")
 
 # Fonts and colors
-font = pygame.font.SysFont('Arial', 60)
+font = pygame.font.SysFont('Impact', 60)
 small_font = pygame.font.SysFont('Arial', 20)
 medium_font = pygame.font.SysFont('Arial', 30)
 medium_font.set_bold(True)
 button_font=pygame.font.Font(None,20)
 button_font.set_bold(True)
+credits_font=pygame.font.SysFont('Calibri',25)
 MONO_FONT = pygame.font.SysFont("Courier New", 24)
 MONO_FONT.set_bold(True)
 white = (255, 255, 255)
@@ -30,6 +31,7 @@ dark_orchid = (153,50,204)
 pinky= (255,204,229)
 light_green=(153,255,51)
 red=(255, 0, 0)
+gold=(255,215,0)
 
 clock = pygame.time.Clock()
 
@@ -85,7 +87,10 @@ class StartScreen(Screen):
         super().__init__()
         self.manager = manager
         self.button_rect = pygame.Rect(WIDTH//2 - 100, HEIGHT//2 + 200, 200, 30)
-        
+        global plot_guess_dict 
+        plot_guess_dict = {}
+        global plotrect
+        plotrect.fill((255,255,255))
         # Create a Figlet title using pyfiglet
         self.figlet_font = pyfiglet.Figlet(font="ticks")
         self.figlet_text = self.figlet_font.renderText("peak")
@@ -358,10 +363,15 @@ class ResultScreen(Screen):
                 pygame.draw.circle(plotrect, color=(0,0,0), center=(xval,yval), radius=3)
         input_seq_colors = [250, 200, 150, 100, 50]
         for seq,color in zip (plot_guess_dict.keys(), input_seq_colors):
-            yval = plot_guess_dict[seq][0] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
-            xval = plot_guess_dict[seq][1] / (max_index_val - min_index_val) * plotwidth #!!!!!!!!! Using a random number here for input in this case which I dont like
-            # print(f'This is the input seq score {plot_guess_dict[seq][0]} x value {xval}, this is the y value {yval}, this is the peak {peak_sequence}')
-            pygame.draw.circle(plotrect, color=(0,color,0), center=(xval,yval), radius=10)
+            if seq == peak_sequence:
+                yval = seqs_scores[peak_sequence] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
+                xval =  seqs_scores_list.index(peak_sequence) / (max_index_val - min_index_val) * plotwidth #converts sequence index to the X value in plot
+                pygame.draw.circle(plotrect, color=gold, center=(xval,yval+20), radius=20)
+            else:
+                yval = plot_guess_dict[seq][0] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
+                xval = plot_guess_dict[seq][1] / (max_index_val - min_index_val) * plotwidth #!!!!!!!!! Using a random number here for input in this case which I dont like
+                # print(f'This is the input seq score {plot_guess_dict[seq][0]} x value {xval}, this is the y value {yval}, this is the peak {peak_sequence}')
+                pygame.draw.circle(plotrect, color=(0,color,0), center=(xval,yval), radius=10)
 
         # Draw Next button unless finished
         if len(self.inputs) < 5:
@@ -411,6 +421,16 @@ class GameOverScreen(Screen):
             scale_factor = HEIGHT / self.bg_height
             self.bg_width = int(self.bg_width * scale_factor)
             self.bg_image = pygame.transform.scale(self.bg_image, (self.bg_width, HEIGHT))
+
+        self.credits = [
+            "Brought to you by:",
+            "Jane, Giancarlo, Vivian and Ananya",
+            "Spirit guided by: Joshua Lynch",
+            "Music: Royalty-free music",
+            "Background art: Ananya",
+            "Built with Python + Pygame",
+            "(with some help from chatGPT)"
+        ]
         
         self.bg_x = 0
         self.scroll_speed = 3  # pixels per frame — tweak this!
@@ -439,6 +459,7 @@ class GameOverScreen(Screen):
         self.bg_x -= self.scroll_speed
         if self.bg_x <= -self.bg_width:
             self.bg_x = 0  # Reset to loop seamlessly
+
     
     def draw(self, surface):
         
@@ -446,23 +467,28 @@ class GameOverScreen(Screen):
         surface.blit(self.bg_image, (self.bg_x + self.bg_width, 0))
         
         title = font.render("Traverse the Peak", True, white)
-        surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
-        
-        restart_or_quit=small_font.render("Press escape to quit or Space to restart",True, pinky)
-        surface.blit(restart_or_quit, (WIDTH//2 - restart_or_quit.get_width()//2, 500))
-        
-        #add best score?
-        # score = medium_font.render(f'Score: {self.score}', True, blue)
-        # surface.blit(score, (20, 40))
-        
+        surface.blit(title, (WIDTH//2 - title.get_width() // 2, 60))
+
         if self.score==0:
             score_text = medium_font.render(f"You won in {len(self.inputs)} tries", True, light_green)
-            score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 20))
-            screen.blit(score_text, score_rect)
+            
         if self.score!=0:
             score_text = medium_font.render(f"Better luck next time! :(", True, white)
-            score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 20))
-            screen.blit(score_text, score_rect)
+        
+        score_rect = score_text.get_rect(center=(WIDTH // 2, 150))
+        screen.blit(score_text, score_rect)
+        
+        y = 200
+        for line in self.credits:
+            txt = credits_font.render(line, True, white)
+            surface.blit(txt, (WIDTH // 2 - txt.get_width() // 2, y))
+            y += 30
+
+
+        restart_or_quit=small_font.render("Press escape to quit or Space to restart",True, pinky)
+        surface.blit(restart_or_quit, (WIDTH//2 - restart_or_quit.get_width()//2, 550))
+        
+        
         
 
 # -------------------------------
