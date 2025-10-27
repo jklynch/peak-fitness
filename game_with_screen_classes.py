@@ -252,11 +252,11 @@ class GameScreen(Screen):
 
          #amino acid image
         og_image = pygame.image.load("amino acid classification.png").convert_alpha() 
-        smaller_image = pygame.transform.scale(og_image, (700, 500))
+        smaller_image = pygame.transform.scale(og_image, (600, 500))
 
         # Get the image's rectangle and position it
         image_rect = smaller_image.get_rect()
-        image_rect.center = (WIDTH // 2, HEIGHT // 2.7)
+        image_rect.center = (WIDTH // 1.8, HEIGHT /2.8)
         surface.blit(smaller_image, image_rect)
 
         #fonts for the label for the input box
