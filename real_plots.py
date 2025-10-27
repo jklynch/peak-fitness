@@ -11,12 +11,11 @@ plotrect = pg.Surface((plotwidth,plotheight)) #creating plot bg
 plotrect.fill((255,255,255)) #coloring plot bg
 
 # --------------------------------------------------------------------
-seqs= activity_and_score_seq.main()
-print(seqs)
-yvalues = list(map(lambda x:x[1], seqs.values()))
+seqs= activity_and_score_seq.score_act_dict()
+yvalues = list(map(lambda x:x[0][1], seqs.values()))
 max_value = max(yvalues)
 min_value = max(yvalues)
-peak_seq = max(seqs.items(), key= lambda item: item[1][1])
+peak_seq = max(seqs.items(), key= lambda item: item[0][1])
 
 
 while True:
