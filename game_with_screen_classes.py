@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 PYGAME_DETECT_AVX2=1
-import pygame, sys, pyfiglet, random, count_seq, peak_seq, Peak
-from Bio.Align import substitution_matrices
+import pygame
+import sys
+import pyfiglet
+import random
+import count_seq
+import Peak
 
 pygame.init()
 pygame.font.init()
@@ -46,7 +50,7 @@ xval = 0
 
 seqs_scores, peak_sequence = Peak.main() # ADDING THE FULL LIST OF AMINOACIDS, also outputs the peakseq which I will assign to _ to avoid an error
 seqs_scores_list = sorted(list(seqs_scores.keys()))
-print(seqs_scores)
+#print(seqs_scores)
 
 min_score_val = seqs_scores[min(seqs_scores, key=seqs_scores.get)] #finds lowest value in dictionary
 max_score_val = seqs_scores[max(seqs_scores, key=seqs_scores.get)] #finds highest value in dictionary
@@ -106,7 +110,7 @@ class StartScreen(Screen):
             "Think about the amino acid classes",
             "You have 5 tries.",
             ]
-        
+ 
         self.bg_image = pygame.image.load("peak_bg.png").convert_alpha()
         self.bg_width = self.bg_image.get_width()
         self.bg_height = self.bg_image.get_height()
@@ -248,7 +252,7 @@ class GameScreen(Screen):
 
          #amino acid image
         og_image = pygame.image.load("amino acid classification.png").convert_alpha() 
-        smaller_image = pygame.transform.scale(og_image, (600, 450))
+        smaller_image = pygame.transform.scale(og_image, (700, 500))
 
         # Get the image's rectangle and position it
         image_rect = smaller_image.get_rect()
@@ -298,7 +302,7 @@ class ResultScreen(Screen):
         self.manager = manager
         self.inputs = inputs
         self.next = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)
-        self.see_result = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)      
+        self.see_result = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)
 
         #getting input from previous screen
         if inputs:
@@ -361,21 +365,45 @@ class ResultScreen(Screen):
         for seq in seqs_scores:
             yval = seqs_scores[seq] * -1/(max_score_val - min_score_val) * (plotheight) #converts count scores to the Y value in plot
             xval =  seqs_scores_list.index(seq) / (max_index_val - min_index_val) * (plotwidth) #converts sequence index to the X value in plot
+            if xval < 10:
+                xval = 10
+            elif xval > 1170:
+                xval = 1170
+            if yval < 12:
+                yval = 12
+            elif yval > 490:
+                yval = 490
             if seq == peak_sequence:
-                pygame.draw.circle(plotrect, color=(0,0,0), center=(xval,yval+20), radius=3)
-                pygame.draw.circle(plotrect, color=(255,0,0), center=(xval,yval+20), radius=10)
+                pygame.draw.circle(plotrect, color=(0,0,0), center=(xval,yval), radius=3)
+                pygame.draw.circle(plotrect, color=(255,0,0), center=(xval,yval), radius=10)
             else:
                 pygame.draw.circle(plotrect, color=(0,0,0), center=(xval,yval), radius=3)
         input_seq_colors = [250, 200, 150, 100, 50]
         for seq,color in zip (plot_guess_dict.keys(), input_seq_colors):
             if seq == peak_sequence:
                 yval = seqs_scores[peak_sequence] * -1/(max_score_val - min_score_val) * (plotheight) #converts count scores to the Y value in plot
-                xval =  seqs_scores_list.index(peak_sequence) / (max_index_val - min_index_val) * (plotwidth*0.9) #converts sequence index to the X value in plot
-                pygame.draw.circle(plotrect, color=gold, center=(xval,yval+20), radius=20)
+                xval =  seqs_scores_list.index(peak_sequence) / (max_index_val - min_index_val) * (plotwidth) #converts sequence index to the X value in plot
+                if xval < 10:
+                    xval = 10
+                elif xval > 1170:
+                    xval = 1170
+                if yval < 12:
+                    yval = 12
+                elif yval > 490:
+                    yval = 490
+                pygame.draw.circle(plotrect, color=gold, center=(xval,yval), radius=12)
             else:
                 yval = plot_guess_dict[seq][0] * -1/(max_score_val - min_score_val) * (plotheight) #converts count scores to the Y value in plot
                 xval = seqs_scores_list.index(seq) / (max_index_val - min_index_val) * (plotwidth) #!!!!!!!!! Using a random number here for input in this case which I dont like
                 # print(f'This is the input seq score {plot_guess_dict[seq][0]} x value {xval}, this is the y value {yval}, this is the peak {peak_sequence}')
+                if xval < 10:
+                    xval = 10
+                elif xval > 1170:
+                    xval = 1170
+                if yval < 12:
+                    yval = 12
+                elif yval > 490:
+                    yval = 490
                 pygame.draw.circle(plotrect, color=(0,color,0), center=(xval,yval), radius=10)
 
         # Draw Next button unless finished
@@ -478,7 +506,7 @@ class GameOverScreen(Screen):
             score_text = medium_font.render(f"You won in {len(self.inputs)} tries", True, light_green)
             
         if self.score!=0:
-            score_text = medium_font.render(f"Better luck next time! :(", True, white)
+            score_text = medium_font.render("Better luck next time! :(", True, white)
         
         score_rect = score_text.get_rect(center=(WIDTH // 2, 150))
         screen.blit(score_text, score_rect)
@@ -537,7 +565,6 @@ def main():
         manager.draw(screen)
         pygame.display.flip()
         clock.tick(60)
-
 
 if __name__ == "__main__":
     main()
