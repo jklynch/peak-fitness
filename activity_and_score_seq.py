@@ -68,7 +68,7 @@ def sim_score(seq):
     return score
 
 
-def dict():
+def score_act_dict():
     url_csv = "https://raw.githubusercontent.com/jtenthor/T5DMS_data_analysis/refs/heads/master/Data/Hs-HIV1_summary.csv"
 
     game_dataset = parse_dataset(url_csv)
@@ -82,17 +82,17 @@ def dict():
     game_dataset['Score'] = game_dataset['seq_aa'].apply(sim_score)
 
     # creates dictionary with seq as key and [Activity, Score] as values
-    dms_dict_withScore = {}
+    dict_withScoreAct = {}
     for index, row in game_dataset.iterrows():
         key = row['seq_aa']
         value_list = [row['Score'], row['Activity']]
         
-        if key not in dms_dict_withScore:
-            dms_dict_withScore[key] = [value_list]
+        if key not in dict_withScoreAct:
+            dict_withScoreAct[key] = [value_list]
         #else:
             #dms_dict_withScore[key].append(value_list)
 
-    return dms_dict_withScore
+    return dict_withScoreAct
 
 if __name__ == "__main__":
     main()

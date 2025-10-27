@@ -10,7 +10,7 @@ import pytest
 
 
 def call_x_y(seq_aa):
-    dictionary = activity_and_score_seq.dict()
+    dictionary = activity_and_score_seq.score_act_dict()
     if seq_aa in dictionary:
         x = dictionary[seq_aa][0][0]
         y = dictionary[seq_aa][0][1]
