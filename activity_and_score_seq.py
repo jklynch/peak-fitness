@@ -15,7 +15,7 @@ def parse_dataset(url_csv):
     data = dms[['seq_aa', 'InputA', 'InputB', 'SortA', 'SortB']]
     
     #search for just those rows that have GnnnnnYQVNF
-    pattern = re.compile(r"G.{5}YQTFV", re.IGNORECASE)
+    pattern = re.compile(r"G.{5}YQTFVNF", re.IGNORECASE)
 
     filtered_data = data[data['seq_aa'].str.contains(pattern, na=False, regex = True)]
     #case=False is case-insensitive
@@ -94,16 +94,15 @@ def score_act_dict():
 
     return dict_withScoreAct
 
+def main():
+    url_csv = 'https://raw.githubusercontent.com/jtenthor/T5DMS_data_analysis/refs/heads/master/Data/Hs-HIV1_summary.csv'
+    print(parse_dataset(url_csv))
+
+    print(score_act_dict())
+
 if __name__ == "__main__":
     main()
     
-
-
-
-
-    
-
-
     #Writes the dict to a new tsv file
     # with open("dms_dict.tsv", "w") as file: #check name of file!
     #     for k, v in dms_dict.items(): #check name of dictionary!
