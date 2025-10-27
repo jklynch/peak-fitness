@@ -8,9 +8,9 @@ import pytest
 
 '''This script calls a sequence and looks it up in a dictionary from activity_and_score_seq.py. If that key exists, then x = value[0], y=[1]. Else, the sequence is the string entered into the function sim_score(seq), in which the sequence = seq.'''
 
+dictionary = activity_and_score_seq.dict()
 
 def call_x_y(seq_aa):
-    dictionary = activity_and_score_seq.score_act_dict()
     if seq_aa in dictionary:
         x = dictionary[seq_aa][0][0]
         y = dictionary[seq_aa][0][1]
