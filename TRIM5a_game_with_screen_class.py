@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 PYGAME_DETECT_AVX2=1
-import pygame, sys, pyfiglet, random, activity_and_score_seq, call_act_and_score_v2
+import pygame, sys, pyfiglet, random, activity_and_score_seq
 from Bio.Align import substitution_matrices
 
 pygame.init()
@@ -19,6 +19,8 @@ medium_font = pygame.font.SysFont('Arial', 30)
 medium_font.set_bold(True)
 button_font=pygame.font.Font(None,20)
 button_font.set_bold(True)
+credits_font=pygame.font.SysFont('Calibri',25)
+tiny_font=pygame.font.SysFont('Arial',10)
 MONO_FONT = pygame.font.SysFont("Courier New", 24)
 MONO_FONT.set_bold(True)
 white = (255, 255, 255)
@@ -30,6 +32,7 @@ dark_orchid = (153,50,204)
 pinky= (255,204,229)
 light_green=(153,255,51)
 red=(255, 0, 0)
+gold=(255,215,0)
 
 clock = pygame.time.Clock()
 
@@ -116,7 +119,9 @@ class StartScreen(Screen):
         
         self.bg_x = 0
         self.scroll_speed = 3  # pixels per frame — tweak this!
-    
+        global plotrect
+        plotrect.fill((255,255,255))
+
     def enter(self):
         pygame.mixer.music.load("wildlife-forest-jungle-background-music-328255.mp3")
         pygame.mixer.music.play(-1) #starts playing music
@@ -203,6 +208,7 @@ class GameScreen(Screen):
         self.inputs = inputs
         self.MAX_COUNT = 5
         global peak
+        global dictionary
     
     #handling inputs for input. Also takes in only amino acid sequences - automatically makes them uppercase
     def handle_event(self, event):
@@ -237,7 +243,7 @@ class GameScreen(Screen):
 
         # Get the image's rectangle and position it
         image_rect = smaller_image.get_rect()
-        image_rect.center = (WIDTH // 2, HEIGHT // 2.7)
+        image_rect.center = (WIDTH // 2 +200, HEIGHT // 2.4)
         surface.blit(smaller_image, image_rect)
 
         #fonts for the label for the input box
@@ -256,17 +262,21 @@ class GameScreen(Screen):
         global peak
         y = 50
         for i, text in enumerate(self.inputs):
-            # print(f'this is i:{i}')
-            # print(f'this is text: {text}')
             seq_aa = 'G'+text+'YQTFVNF'
-            self.score,self.activity = call_act_and_score_v2.call_x_y(seq_aa)
+            if seq_aa in dictionary.keys():
+                score=dictionary[seq_aa][0][0]
+                activity=dictionary[seq_aa][0][1]
+            elif seq_aa not in dictionary.keys():
+                score=activity_and_score_seq.sim_score(seq_aa)
+                activity=0
             # Create the colored text for this guess
-            for j, char in enumerate(text):
+            seq_aa = 'G'+text+'YQTFVNF'
+            for j, char in enumerate(seq_aa):
                 color = green if char == peak[j] else black
                 letter_surface = small_font.render(char, True, color)
-                surface.blit(letter_surface, (20 + j * 30, y))
-                final_val=20 + j * 30
-            line = small_font.render(f'Score:{self.score}, Activity:{self.activity}', True, black)
+                surface.blit(letter_surface, (10 + j * 20, y))
+                final_val=10 + j * 20
+            line = small_font.render(f'Score:{score}, Activity:{activity}', True, black)
             surface.blit(line, (final_val+30, y))
             y += 30
 
@@ -287,13 +297,17 @@ class ResultScreen(Screen):
         self.next = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)
         self.see_result = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)      
         global peak
-
+        
         #getting input from previous screen
         if inputs:
             self.last_input = inputs[-1]
             self.seq_aa = 'G'+self.last_input+'YQTFVNF'
-            self.score,self.activity = call_act_and_score_v2.call_x_y(self.seq_aa)
-            print(self.score) #this is just for checking the peak_seq function
+            if self.seq_aa in dictionary.keys():
+                self.score=dictionary[self.seq_aa][0][0]
+                self.activity=dictionary[self.seq_aa][0][1]
+            elif self.seq_aa not in dictionary.keys():
+                self.score=activity_and_score_seq.sim_score(self.seq_aa)
+                self.activity=0
         else:
             self.last_input = ""
             self.result1 = 0
@@ -306,7 +320,7 @@ class ResultScreen(Screen):
                 # If less than 3 inputs, go back to Game Screen
                 if len(self.inputs) < 5:
                     self.manager.set_screen(GameScreen(self.manager, self.inputs))
-                    if self.score ==0:
+                    if self.score ==0 and self.activity==21.2:
                         self.manager.set_screen(GameOverScreen(self.manager, self.inputs))
                     else:
                         self.manager.set_screen(GameScreen(self.manager, self.inputs))
@@ -318,21 +332,27 @@ class ResultScreen(Screen):
         
         surface.fill(white)
         screen.blit(plotrect, (50,50))
-        title = font.render("Traverse the Peak", True, black)
-        surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
-        global peak
+        # title = font.render("Traverse the Peak", True, black)
+        # surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
 
+        #Display previous guesses
+        global peak
         y = 50
         for i, text in enumerate(self.inputs):
-            self.last_input = self.inputs[-1]
-            self.seq_aa = 'G'+self.last_input+'YQTFVNF'
-            score,activity = call_act_and_score_v2.call_x_y(self.seq_aa)
+            seq_aa = 'G'+text+'YQTFVNF'
+            if seq_aa in dictionary.keys():
+                score=dictionary[seq_aa][0][0]
+                activity=dictionary[seq_aa][0][1]
+            elif seq_aa not in dictionary.keys():
+                score=activity_and_score_seq.sim_score(seq_aa)
+                activity=0
             # Create the colored text for this guess
-            for j, char in enumerate(text):
+            seq_aa = 'G'+text+'YQTFVNF'
+            for j, char in enumerate(seq_aa):
                 color = green if char == peak[j] else black
                 letter_surface = small_font.render(char, True, color)
-                surface.blit(letter_surface, (20 + j * 30, y))
-                final_val=20 + j * 30
+                surface.blit(letter_surface, (10 + j * 20, y))
+                final_val=10 + j * 20
             line = small_font.render(f'Score:{score}, Activity:{activity}', True, black)
             surface.blit(line, (final_val+30, y))
             y += 30
@@ -387,7 +407,14 @@ class GameOverScreen(Screen):
         if inputs:
             self.last_input = inputs[-1]
             self.seq_aa = 'G'+self.last_input+'YQTFVNF'
-            self.score,self.activity = call_act_and_score_v2.call_x_y(self.seq_aa)
+            self.last_input = self.inputs[-1]
+            self.seq_aa = 'G'+self.last_input+'YQTFVNF'
+            if self.seq_aa in dictionary.keys():
+                self.score=dictionary[self.seq_aa][0][0]
+                self.activity=dictionary[self.seq_aa][0][1]
+            elif self.seq_aa not in dictionary.keys():
+                self.score=activity_and_score_seq.sim_score(self.seq_aa)
+                self.activity=0
 
         else:
             self.last_input = ""
@@ -405,6 +432,16 @@ class GameOverScreen(Screen):
         
         self.bg_x = 0
         self.scroll_speed = 3  # pixels per frame — tweak this!
+
+        self.credits = [
+            "Brought to you by:",
+            "Jane, Giancarlo, Vivian and Ananya",
+            "Spirit guided by: Joshua Lynch",
+            "Music: Royalty-free music",
+            "Background art: Ananya",
+            "Built with Python + Pygame",
+            "(with some help from chatGPT)"
+        ]
         
 
     #type of input- currently just have a next button but we can change that
@@ -418,7 +455,7 @@ class GameOverScreen(Screen):
     def enter(self):
         pygame.mixer.music.fadeout(1500)
         
-        if self.score == 0:
+        if self.score == 0 and self.activity==21.2:
             pygame.mixer.music.load("awards-ceremony-winner-background-music-330167.mp3")
         else:
             pygame.mixer.music.load("losing-horn-313723.mp3")
@@ -433,27 +470,30 @@ class GameOverScreen(Screen):
     
     def draw(self, surface):
         
-        surface.blit(self.bg_image, (self.bg_x, 0))
-        surface.blit(self.bg_image, (self.bg_x + self.bg_width, 0))
+       surface.blit(self.bg_image, (self.bg_x, 0))
+       surface.blit(self.bg_image, (self.bg_x + self.bg_width, 0))
         
-        title = font.render("Traverse the Peak", True, white)
-        surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
-        
-        restart_or_quit=small_font.render("Press escape to quit or Space to restart",True, pinky)
-        surface.blit(restart_or_quit, (WIDTH//2 - restart_or_quit.get_width()//2, 500))
-        
-        #add best score?
-        # score = medium_font.render(f'Score: {self.score}', True, blue)
-        # surface.blit(score, (20, 40))
-        
-        if self.score==0:
+       title = font.render("Traverse the Peak", True, white)
+       surface.blit(title, (WIDTH//2 - title.get_width() // 2, 60))
+
+       if self.score==0 and self.activity==21.2:
             score_text = medium_font.render(f"You won in {len(self.inputs)} tries", True, light_green)
-            score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 20))
-            screen.blit(score_text, score_rect)
-        if self.score!=0:
+            
+       if self.score!=0 and self.activity!=21.2:
             score_text = medium_font.render(f"Better luck next time! :(", True, white)
-            score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 20))
-            screen.blit(score_text, score_rect)
+        
+       score_rect = score_text.get_rect(center=(WIDTH // 2, 150))
+       screen.blit(score_text, score_rect)
+        
+       y = 200
+       for line in self.credits:
+            txt = credits_font.render(line, True, white)
+            surface.blit(txt, (WIDTH // 2 - txt.get_width() // 2, y))
+            y += 30
+
+
+       restart_or_quit=small_font.render("Press escape to quit or Space to restart",True, pinky)
+       surface.blit(restart_or_quit, (WIDTH//2 - restart_or_quit.get_width()//2, 550))
         
 
 # -------------------------------
