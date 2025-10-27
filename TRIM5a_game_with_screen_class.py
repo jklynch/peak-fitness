@@ -9,6 +9,8 @@ pygame.mixer.init()
 
 # Screen setup
 WIDTH, HEIGHT = 1280, 720
+LEFT_MARGIN, RIGHT_MARGIN = 100, 10
+TOP_MARGIN, BOTTOM_MARGIN = 80, 100
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Peak fitness")
 
@@ -53,11 +55,15 @@ peak = 'GERGTRYQTFVNF'
 # Plots - - - - 
 #
 plotheight = 500
-plotwidth = 1180
-seqs = dictionary
+# plotwidth = 1180
+plotwidth = 900
+LEFT_MARGIN = (WIDTH - plotwidth) // 2
+TOP_MARGIN = (HEIGHT - plotheight) // 2
+# seqs = dictionary
 plotrect = pygame.Surface((plotwidth,plotheight)) #creating plot bg
-plotrect.fill((255,255,255)) #coloring the plot
-yvalues = list(map(lambda x:x[0][1], seqs.values()))
+# plotrect.fill((255,255,255)) #coloring the plot
+plotrect.fill((0,0,0))
+yvalues = list(map(lambda x:x[0][1], dictionary.values()))
 
 
 
@@ -263,6 +269,7 @@ class GameScreen(Screen):
         
         #Display previous guesses
         global peak
+        global dictionary
         y = 50
         for i, text in enumerate(self.inputs):
             seq_aa = 'G'+text+'YQTFVNF'
@@ -300,6 +307,7 @@ class ResultScreen(Screen):
         self.next = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)
         self.see_result = pygame.Rect(WIDTH//2 - 100, HEIGHT - 150, 200, 80)      
         global peak
+        global dictionary
         
         #getting input from previous screen
         if inputs:
@@ -315,24 +323,6 @@ class ResultScreen(Screen):
             self.last_input = ""
             self.result1 = 0
             self.result2 = 0
-
-    def compress_coords(score_x, score_y,-7, 3, 0, 21.2, 1180, 500,compression_strength=0.5):
-        # normalize to [0, 1]
-        xnorm = (score_x - min_score_value) / (max_score_value - min_score_value)
-        ynorm = (score_y - min_activity_value) / (max_activity_value - min_activity_value)
-
-        # center and apply nonlinear compression (symmetric around 0.5)
-        x_centered = xnorm - 0.5
-        y_centered = ynorm - 0.5
-
-        x_compressed = math.copysign(abs(x_centered) ** compression_strength, x_centered) + 0.5
-        y_compressed = math.copysign(abs(y_centered) ** compression_strength, y_centered) + 0.5
-
-        # map back to pixel coordinates
-        xval = x_compressed * plotwidth
-        yval = plotheight - (y_compressed * plotheight)  # flip Y if origin is top-left
-
-        return xval, yval
 
     #type of input- currently just have a next button but we can change that
     def handle_event(self, event):
@@ -351,13 +341,12 @@ class ResultScreen(Screen):
     #drawing stuff to surface!               
     def draw(self, surface):
         
-        surface.fill(white)
+        surface.fill((white))
         screen.blit(plotrect, (50,50))
-        # title = font.render("Traverse the Peak", True, black)
-        # surface.blit(title, (WIDTH//2 - title.get_width()//2, 80))
 
         #Display previous guesses
         global peak
+        global dictionary
         y = 50
         for i, text in enumerate(self.inputs):
             seq_aa = 'G'+text+'YQTFVNF'
@@ -382,59 +371,57 @@ class ResultScreen(Screen):
         activity_range = list(map(lambda x:x[0][1], dictionary.values())) #aka y values
         max_activity_value = max(activity_range)
         min_activity_value = min(activity_range)
-
+        # print(activity_range)
         score_range = list(map(lambda x:x[0][0], dictionary.values())) #aka x values
         max_score_value = max(score_range)
         min_score_value = min(score_range)
-        
-        # for seq in seqs_scores:
-        #     yval = seqs_scores[seq] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
-        #     xval =  seqs_scores_list.index(seq) / (max_index_val - min_index_val) * plotwidth #converts sequence index to the X value in plot
-        #     if seq == peak:
-        #         pygame.draw.circle(plotrect, color=(0,0,0), center=(xval,yval+20), radius=3)
-        #         pygame.draw.circle(plotrect, color=(255,0,0), center=(xval,yval+20), radius=10)
-        #     else:
-        #         pygame.draw.circle(plotrect, color=(0,0,0), center=(xval,yval), radius=3)
-        # input_seq_colors = [250, 200, 150, 100, 50]
-        # for seq,color in zip (plot_guess_dict.keys(), input_seq_colors):
-        #     yval = plot_guess_dict[seq][0] * -1/(max_score_val - min_score_val) * plotheight #converts count scores to the Y value in plot
-        #     xval = plot_guess_dict[seq][1] / (max_index_val - min_index_val) * plotwidth #!!!!!!!!! Using a random number here for input in this case which I dont like
-        #     # print(f'This is the input seq score {plot_guess_dict[seq][0]} x value {xval}, this is the y value {yval}, this is the peak {global peak}')
-        #     pygame.draw.circle(plotrect, color=(0,color,0), center=(xval,yval), radius=10)
+
+        PADDING_LEFT = 60
+        PADDING_TOP = 20
+        PADDING_RIGHT, PADDING_BOTTOM = 20, 20
+        circle_radius = 3
 
     #populate the graph with all existing seqs
-        for seq in seqs:
-            score_x = seqs[seq][0][0] + 8
-            score_y = seqs[seq][0][1] + 1
-            xval,yval = compress_coords(score_x, score_y) #converts count scores to the Y value in plot
-            #print(f'max_score = {max_score_value}, min_score = {min_score_value}, max_activity = {max_activity_value}, min_activity = {min_activity_value}')
-            pygame.draw.circle(plotrect, color=(0,0,0), center=(xval,yval), radius=3)
-    #plot the input seq and check to make sure it's not the peak seq, if it is, it is also plotted
-        print(f'this is self.input {self.inputs}')
+        for seq in dictionary:
+            if seq == peak:
+                score_x = 0
+                score_y = 21.2
+                xval = LEFT_MARGIN + (score_x - min_score_value) / (max_score_value - min_score_value) * (plotwidth - LEFT_MARGIN - RIGHT_MARGIN)
+                yval = plotheight - ((score_y -min_activity_value)/(max_activity_value - min_activity_value) * (plotheight - PADDING_TOP - PADDING_BOTTOM) + PADDING_BOTTOM)
+
+                pygame.draw.circle(plotrect, (255,0,0), (xval,yval), 8)
+            else:
+                score_x = dictionary[seq][0][0]
+                score_y = dictionary[seq][0][1]
+                xval = LEFT_MARGIN + (score_x - min_score_value) / (max_score_value - min_score_value) * (plotwidth - LEFT_MARGIN - RIGHT_MARGIN)
+                yval = plotheight - ((score_y -min_activity_value)/(max_activity_value - min_activity_value) * (plotheight - PADDING_TOP - PADDING_BOTTOM) + PADDING_BOTTOM)
+
+                pygame.draw.circle(plotrect, (0,0,0), (xval,yval), circle_radius)
+            
         for line in self.inputs:
             seq = 'G'+line+'YQTFVNF'
             if seq == peak:
                 score_x = 0
-                score_y = 21.2 + 1
-                yval = plotheight - (score_y/(max_activity_value-min_activity_value)) * plotheight #converts count scores to the Y value in plot
-                xval = (score_x/ (max_score_value-min_score_value)) * plotwidth #converts sequence index to the X value in plot
-                pygame.draw.circle(plotrect, color=(255,0,0), center=(xval,yval+20), radius=10)
-                print ('seq = peak')
-            elif seq in seqs:
-                score_x = seqs[seq][0][0]+8
-                score_y = seqs[seq][0][1] + 1
-                yval = plotheight - (score_y/(max_activity_value-min_activity_value)) * plotheight #converts count scores to the Y value in plot
-                xval = (score_x/ (max_score_value-min_score_value)) * plotwidth #converts sequence index to the X value in plot
-                pygame.draw.circle(plotrect, color=blue, center=(xval,yval), radius=3)
-                print('seq in seqs')
+                score_y = 21.2
+                xval = LEFT_MARGIN + (score_x - min_score_value) / (max_score_value - min_score_value) * (plotwidth - LEFT_MARGIN - RIGHT_MARGIN)
+                yval = plotheight - ((score_y -min_activity_value)/(max_activity_value - min_activity_value) * (plotheight - PADDING_TOP - PADDING_BOTTOM) + PADDING_BOTTOM)
+
+                pygame.draw.circle(plotrect, (255,0,0), (xval,yval), 5)
+
+            elif seq in dictionary:
+                score_x = dictionary[seq][0][0]
+                score_y = dictionary[seq][0][1] + 1
+                xval = LEFT_MARGIN + (score_x - min_score_value) / (max_score_value - min_score_value) * (plotwidth - LEFT_MARGIN - RIGHT_MARGIN)
+                yval = plotheight - ((score_y -min_activity_value)/(max_activity_value - min_activity_value) * (plotheight - PADDING_TOP - PADDING_BOTTOM) + PADDING_BOTTOM)
+                pygame.draw.circle(plotrect, (0,255,0), (xval,yval), 5)
+            
             else:
                 score_x = activity_and_score_seq.sim_score(seq)
                 score_y = 0 + 1
-                yval = plotheight - (score_y/(max_activity_value-min_activity_value)) * plotheight #converts count scores to the Y value in plot
-                xval = (score_x/ (max_score_value-min_score_value)) * plotwidth #converts sequence index to the X value in plot
-                pygame.draw.circle(plotrect, color=(0,255,0), center=(xval,yval), radius=8)
-                activity = 0
-                print(seq)
+                xval = LEFT_MARGIN + (score_x - min_score_value) / (max_score_value - min_score_value) * (plotwidth - LEFT_MARGIN - RIGHT_MARGIN)
+                yval = plotheight - ((score_y -min_activity_value)/(max_activity_value - min_activity_value) * (plotheight - PADDING_TOP - PADDING_BOTTOM) + PADDING_BOTTOM)
+                pygame.draw.circle(plotrect, (0,255,0), (xval,yval), 5)
+
 
 
 
@@ -611,5 +598,5 @@ def main():
 
 
 if __name__ == "__main__":
-    print(dictionary)
+    # print(dictionary)
     main()
